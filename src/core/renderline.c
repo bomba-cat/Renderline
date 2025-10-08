@@ -15,12 +15,16 @@ RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
 
   struct RL_Window *rl_window_i =
       (struct RL_Window *)malloc(sizeof(struct RL_Window));
+  if (rl_window_i == NULL) {
+    return NULL;
+  }
+
   rl_window_i->sdl_window = SDL_CreateWindow(
       gameinfo->name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width,
       height, SDL_WINDOW_SHOWN);
   rl_window_i->title = strdup(gameinfo->name);
 
-  if (rl_window_i == NULL || rl_window_i->sdl_window == NULL ||
+  if (rl_window_i->sdl_window == NULL ||
       strcmp(rl_window_i->title, gameinfo->name)) {
     RL_DestroyWindow(rl_window_i);
     return NULL;
@@ -51,12 +55,15 @@ RL_GameInfo *RL_CreateGameInfo(char *name, char *description, char *version) {
 
   struct RL_GameInfo *rl_gameinfo_i =
       (struct RL_GameInfo *)malloc(sizeof(struct RL_GameInfo));
+  if (rl_gameinfo_i == NULL) {
+    return NULL;
+  }
+
   rl_gameinfo_i->description = strdup(description);
   rl_gameinfo_i->name = strdup(name);
   rl_gameinfo_i->version = strdup(version);
 
-  if (rl_gameinfo_i == NULL ||
-      strcmp(rl_gameinfo_i->description, description) ||
+  if (strcmp(rl_gameinfo_i->description, description) ||
       strcmp(rl_gameinfo_i->name, name) ||
       strcmp(rl_gameinfo_i->version, version)) {
     RL_DestroyGameInfo(rl_gameinfo_i);

@@ -7,7 +7,7 @@
 struct RL_GameInfo {
   char *name;
   char *description;
-  char *version; /* The reason this is kept a character is
+  char *version; /* The reason this is kept as a character is
                   * for games going with versions like: 0.1.2 */
 };
 

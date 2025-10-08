@@ -3,7 +3,12 @@
 
 struct RL_GameInfo rl_gameinfo_i;
 
-RL_Error RL_SetGameInfoStruct(RL_GameInfo gameinfo) {
+RL_Error RL_Init() {
+  /* Created this for later use */
+  return RL_OK;
+}
+
+RL_Error RL_SetGameInfo(RL_GameInfo gameinfo) {
   if (gameinfo.description == NULL || gameinfo.name == NULL ||
       gameinfo.version == NULL) {
     return RL_UNDEFINED_ERROR;

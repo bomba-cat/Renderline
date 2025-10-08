@@ -1,0 +1,34 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+
+SpaceBeforeParens: Never
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: Never
+
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
+
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+
+ColumnLimit: 100
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackParameters: false
+BinPackArguments: false
+
+IncludeBlocks: Regroup
+SortIncludes: true
+
+ReflowComments: true
+SpacesBeforeTrailingComments: 1
+
+Cpp11BracedListStyle: false
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false

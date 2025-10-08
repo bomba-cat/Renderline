@@ -29,10 +29,11 @@ RL_Error RL_Bar(const char *path, RL_Foo **out);
 ## Error Handling
 
 * **All public API functions return an `RL_Error` enum**.
-* Functions that return data must use **output parameters + error codes**:
+* Functions that return data **must return NULL on failure** and **have to be a pointer**:
 
   ```c
-  RL_Error RL_Bar(const char *path, RL_Foo **out);
+  RL_Error RL_Bar(const char *path);
+  RL_Foo *RL_Bar(const char *path);
   ```
 * Never use global error state. Keep everything thread-safe.
 

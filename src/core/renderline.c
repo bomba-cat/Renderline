@@ -1,72 +1,87 @@
 #include "../../include/renderline.h"
 #include "rl_internal.h"
 
-struct RL_GameInfo rl_gameinfo_i;
-
 RL_Error RL_Init() {
-  /* Created this for later use */
+  if (SDL_Init(SDL_INIT_VIDEO) > 0) {
+    return RL_UNDEFINED_ERROR;
+  }
   return RL_OK;
 }
 
-RL_Error RL_SetGameInfo(RL_GameInfo gameinfo) {
-  if (gameinfo.description == NULL || gameinfo.name == NULL ||
-      gameinfo.version == NULL) {
+RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
+  if (gameinfo == NULL || gameinfo->name == NULL || width <= 0 || height <= 0) {
+    return NULL;
+  }
+
+  struct RL_Window *rl_window_i =
+      (struct RL_Window *)malloc(sizeof(struct RL_Window));
+  rl_window_i->sdl_window = SDL_CreateWindow(
+      gameinfo->name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width,
+      height, SDL_WINDOW_SHOWN);
+  rl_window_i->title = strdup(gameinfo->name);
+
+  if (rl_window_i == NULL || rl_window_i->sdl_window == NULL ||
+      strcmp(rl_window_i->title, gameinfo->name)) {
+    RL_DestroyWindow(rl_window_i);
+    return NULL;
+  }
+  return rl_window_i;
+}
+
+RL_Error RL_DestroyWindow(RL_Window *window) {
+  if (window == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  rl_gameinfo_i.description = strdup(gameinfo.description);
-  rl_gameinfo_i.name = strdup(gameinfo.name);
-  rl_gameinfo_i.version = strdup(gameinfo.version);
-
-  if (strcmp(rl_gameinfo_i.description, gameinfo.description) ||
-      strcmp(rl_gameinfo_i.name, gameinfo.name) ||
-      strcmp(rl_gameinfo_i.version, gameinfo.version)) {
-    return RL_UNDEFINED_ERROR;
+  if (window->sdl_window) {
+    SDL_DestroyWindow(window->sdl_window);
   }
+  if (window->title) {
+    free(window->title);
+  }
+  free(window);
 
   return RL_OK;
 }
 
-RL_Error RL_SetGameInfoParams(char *name, char *description, char *version) {
+RL_GameInfo *RL_CreateGameInfo(char *name, char *description, char *version) {
   if (description == NULL || name == NULL || version == NULL) {
-    return RL_UNDEFINED_ERROR;
+    return NULL;
   }
 
-  rl_gameinfo_i.description = strdup(description);
-  rl_gameinfo_i.name = strdup(name);
-  rl_gameinfo_i.version = strdup(version);
+  struct RL_GameInfo *rl_gameinfo_i =
+      (struct RL_GameInfo *)malloc(sizeof(struct RL_GameInfo));
+  rl_gameinfo_i->description = strdup(description);
+  rl_gameinfo_i->name = strdup(name);
+  rl_gameinfo_i->version = strdup(version);
 
-  if (strcmp(rl_gameinfo_i.description, description) ||
-      strcmp(rl_gameinfo_i.name, name) ||
-      strcmp(rl_gameinfo_i.version, version)) {
-    return RL_UNDEFINED_ERROR;
+  if (rl_gameinfo_i == NULL ||
+      strcmp(rl_gameinfo_i->description, description) ||
+      strcmp(rl_gameinfo_i->name, name) ||
+      strcmp(rl_gameinfo_i->version, version)) {
+    RL_DestroyGameInfo(rl_gameinfo_i);
+    return NULL;
   }
 
-  return RL_OK;
+  return rl_gameinfo_i;
 }
 
-RL_Error RL_GetGameInfo(RL_GameInfo *gameinfo) {
-  if (rl_gameinfo_i.description == NULL || rl_gameinfo_i.name == NULL ||
-      rl_gameinfo_i.version == NULL) {
+RL_Error RL_DestroyGameInfo(RL_GameInfo *gameinfo) {
+  if (gameinfo == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  gameinfo->description = strdup(rl_gameinfo_i.description);
-  gameinfo->name = strdup(rl_gameinfo_i.name);
-  gameinfo->version = strdup(rl_gameinfo_i.version);
-
-  if (strcmp(rl_gameinfo_i.description, gameinfo->description) ||
-      strcmp(rl_gameinfo_i.name, gameinfo->name) ||
-      strcmp(rl_gameinfo_i.version, gameinfo->version)) {
-    return RL_UNDEFINED_ERROR;
+  if (gameinfo->description) {
+    free(gameinfo->description);
   }
-  return RL_OK;
-}
+  if (gameinfo->name) {
+    free(gameinfo->name);
+  }
+  if (gameinfo->version) {
+    free(gameinfo->version);
+  }
 
-RL_Error RL_Quit() {
-  free(rl_gameinfo_i.description);
-  free(rl_gameinfo_i.name);
-  free(rl_gameinfo_i.version);
+  free(gameinfo);
 
   return RL_OK;
 }

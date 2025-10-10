@@ -13,6 +13,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(RENDERLINE_SOURCES
 	src/audio/rl_audio.c
 	src/core/renderline.c
+	src/core/rl_menu.c
 	src/io/rl_file.c
 	src/render/rl_sprite.c
 	src/render/rl_surface.c

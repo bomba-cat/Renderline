@@ -37,13 +37,17 @@ RL_Error RL_DestroyWindow(RL_Window *window) {
     return RL_UNDEFINED_ERROR;
   }
 
-  if (window->sdl_window) {
-    SDL_DestroyWindow(window->sdl_window);
-  }
-  if (window->title) {
-    free(window->title);
-  }
+  SDL_DestroyWindow(window->sdl_window);
+  free(window->title);
   free(window);
+
+  window->sdl_window = NULL;
+  window->title = NULL;
+  window = NULL;
+
+  if (window != NULL || window->sdl_window != NULL || window->title != NULL) {
+    return RL_UNDEFINED_ERROR;
+  }
 
   return RL_OK;
 }
@@ -78,17 +82,20 @@ RL_Error RL_DestroyGameInfo(RL_GameInfo *gameinfo) {
     return RL_UNDEFINED_ERROR;
   }
 
-  if (gameinfo->description) {
-    free(gameinfo->description);
-  }
-  if (gameinfo->name) {
-    free(gameinfo->name);
-  }
-  if (gameinfo->version) {
-    free(gameinfo->version);
-  }
-
+  free(gameinfo->description);
+  free(gameinfo->name);
+  free(gameinfo->version);
   free(gameinfo);
+
+  gameinfo->description = NULL;
+  gameinfo->name = NULL;
+  gameinfo->version = NULL;
+  gameinfo = NULL;
+
+  if (gameinfo != NULL || gameinfo->description != NULL ||
+      gameinfo->name != NULL || gameinfo->version != NULL) {
+    return RL_UNDEFINED_ERROR;
+  }
 
   return RL_OK;
 }

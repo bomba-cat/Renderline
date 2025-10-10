@@ -2,7 +2,7 @@
 #include "rl_internal.h"
 
 RL_Error RL_Init() {
-  if (SDL_Init(SDL_INIT_VIDEO) > 0) {
+  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     return RL_UNDEFINED_ERROR;
   }
   return RL_OK;
@@ -40,14 +40,7 @@ RL_Error RL_DestroyWindow(RL_Window *window) {
   SDL_DestroyWindow(window->sdl_window);
   free(window->title);
   free(window);
-
-  window->sdl_window = NULL;
-  window->title = NULL;
   window = NULL;
-
-  if (window != NULL || window->sdl_window != NULL || window->title != NULL) {
-    return RL_UNDEFINED_ERROR;
-  }
 
   return RL_OK;
 }
@@ -86,16 +79,7 @@ RL_Error RL_DestroyGameInfo(RL_GameInfo *gameinfo) {
   free(gameinfo->name);
   free(gameinfo->version);
   free(gameinfo);
-
-  gameinfo->description = NULL;
-  gameinfo->name = NULL;
-  gameinfo->version = NULL;
   gameinfo = NULL;
-
-  if (gameinfo != NULL || gameinfo->description != NULL ||
-      gameinfo->name != NULL || gameinfo->version != NULL) {
-    return RL_UNDEFINED_ERROR;
-  }
 
   return RL_OK;
 }

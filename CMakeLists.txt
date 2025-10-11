@@ -21,7 +21,9 @@ set(RENDERLINE_SOURCES
 )
 
 find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} include)
+include_directories(${SDL2_TTF_INCLUDE_DIRS} include)
 
 add_library(Renderline SHARED
 	${RENDERLINE_SOURCES}
@@ -30,6 +32,7 @@ add_library(Renderline SHARED
 target_link_libraries(Renderline
 	PRIVATE
 	SDL2::SDL2
+	SDL2_ttf:SDL2_ttf
 )
 
 target_include_directories(Renderline PUBLIC include)

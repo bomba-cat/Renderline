@@ -1,5 +1,5 @@
 #include "../../include/renderline.h"
-#include "../core/rl_internal.h"
+#include "rl_internal.h"
 
 RL_Menu *RL_CreateMenu() {
   struct RL_Menu *rl_menu_i = (struct RL_Menu *)malloc(sizeof(struct RL_Menu));

@@ -5,8 +5,20 @@ RL_Error RL_Init() {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     return RL_UNDEFINED_ERROR;
   }
+  if (TTF_Init() != 0) {
+    SDL_Quit();
+    return RL_UNDEFINED_ERROR;
+  }
   return RL_OK;
 }
+
+RL_Error RL_Quit() {
+  TTF_Quit();
+  SDL_Quit();
+  return RL_OK;
+}
+
+RL_Error rl_draw_hint_i(RL_Window *window) { return RL_OK; }
 
 RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
   if (gameinfo == NULL || gameinfo->name == NULL || width <= 0 || height <= 0) {

@@ -21,7 +21,9 @@ RL_Error RL_Quit() {
 RL_Error rl_draw_hint_i(RL_Window *window) { return RL_OK; }
 
 RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
-  if (gameinfo == NULL || gameinfo->name == NULL || width <= 0 || height <= 0) {
+  if (gameinfo == NULL || width <= 0 || height <= 0) {
+    return NULL;
+  } else if (gameinfo->name == NULL) {
     return NULL;
   }
 

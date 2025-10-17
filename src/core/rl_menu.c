@@ -34,13 +34,13 @@ RL_Error rl_get_functions_size_i(void *(**functions)(void), int *count) {
 }
 
 RL_Error rl_get_entries_size_i(char **entries, int *count) {
-  if (entries == NULL || *count != 0) {
+  if (entries == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  while (entries[*count] != NULL) {
+  do {
     (*count)++;
-  }
+  } while (entries[*count] != NULL);
 
   return RL_OK;
 }
@@ -57,12 +57,11 @@ RL_Error RL_AddMenuEntry(RL_Menu *menu, char *entry, void *(*func)(void)) {
     return RL_UNDEFINED_ERROR;
   }
 
-  /* The reason we add +2 is because the get size functions
-   * don't increment for the NULL entry causing a mismatch in size. */
+  /* TODO: fix invalid realloc size */
   void *rl_entries_new_ptr_i =
-      realloc(menu->entries, sizeof(char **) * (rl_entries_count_i + 2));
+      realloc(menu->entries, sizeof(char **) * (rl_entries_count_i + 1));
   void *rl_functions_new_ptr_i = realloc(
-      menu->functions, sizeof(void *(**)(void)) * (rl_functions_count_i + 2));
+      menu->functions, sizeof(void *(**)(void)) * (rl_functions_count_i + 1));
   if (rl_entries_new_ptr_i == NULL || rl_functions_new_ptr_i == NULL) {
     return RL_UNDEFINED_ERROR;
   }

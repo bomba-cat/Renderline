@@ -44,10 +44,11 @@ RL_Error RL_Init();
 RL_Error RL_Quit();
 
 /* Helper functions */
+RL_Error RL_DefaultWindowFont(RL_Window *window, RL_Font *font);
 RL_Error RL_AddMenuEntry(RL_Menu *menu, char *entry, void *(*func)(void));
 RL_Error RL_ShowMenu(RL_Menu *menu);
 
-/* Constructor fucntions */
+/* Constructor functions */
 RL_Font *RL_CreateFont(const char *path, uint8_t size);
 RL_Menu *RL_CreateMenu();
 RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height);

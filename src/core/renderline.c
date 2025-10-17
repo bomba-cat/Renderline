@@ -36,6 +36,9 @@ RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
   rl_window_i->sdl_window = SDL_CreateWindow(
       gameinfo->name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width,
       height, SDL_WINDOW_SHOWN);
+  /* Explicitly set this to NULL for now
+   * TODO: Maybe create a real standard font*/
+  rl_window_i->default_font = NULL;
   rl_window_i->title = strdup(gameinfo->name);
 
   if (rl_window_i->sdl_window == NULL ||

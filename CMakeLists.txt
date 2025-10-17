@@ -32,7 +32,7 @@ add_library(Renderline SHARED
 target_link_libraries(Renderline
 	PRIVATE
 	SDL2::SDL2
-	SDL2_ttf:SDL2_ttf
+	SDL2_ttf::SDL2_ttf
 )
 
 target_include_directories(Renderline PUBLIC include)

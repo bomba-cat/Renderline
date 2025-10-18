@@ -90,7 +90,7 @@ RL_Error RL_DestroyMenu(RL_Menu *menu) {
     return RL_UNDEFINED_ERROR;
   }
 
-  for (size_t entry = 1; menu->entries[entry] != NULL; entry++) {
+  for (size_t entry = 0; menu->entries[entry] != NULL; entry++) {
     free(menu->entries[entry]);
     menu->entries[entry] = NULL;
   }

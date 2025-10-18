@@ -2,14 +2,14 @@
 #include "rl_internal.h"
 
 RL_Menu *RL_CreateMenu() {
-  struct RL_Menu *rl_menu_i = (struct RL_Menu *)malloc(sizeof(struct RL_Menu));
+  struct RL_Menu *rl_menu_i = malloc(sizeof *rl_menu_i);
 
   if (rl_menu_i == NULL) {
     return NULL;
   }
 
-  rl_menu_i->entries = (char **)malloc(sizeof(char *) * 1);
-  rl_menu_i->functions = (void *(**)(void))malloc(sizeof(void *(**)(void)) * 1);
+  rl_menu_i->entries = malloc(sizeof *rl_menu_i->entries);
+  rl_menu_i->functions = malloc(sizeof *rl_menu_i->functions);
   if (rl_menu_i->entries == NULL || rl_menu_i->functions == NULL) {
     RL_DestroyMenu(rl_menu_i);
     return NULL;
@@ -22,13 +22,13 @@ RL_Menu *RL_CreateMenu() {
 }
 
 RL_Error rl_get_functions_size_i(void *(**functions)(void), int *count) {
-  if (functions == NULL || *count != 0) {
+  if (functions == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  while (functions[*count] != NULL) {
+  do {
     (*count)++;
-  }
+  } while (functions[*count - 1] != NULL);
 
   return RL_OK;
 }
@@ -40,7 +40,7 @@ RL_Error rl_get_entries_size_i(char **entries, int *count) {
 
   do {
     (*count)++;
-  } while (entries[*count] != NULL);
+  } while (entries[*count - 1] != NULL);
 
   return RL_OK;
 }

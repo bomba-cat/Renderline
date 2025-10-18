@@ -2,7 +2,7 @@
 #include "../core/rl_internal.h"
 
 SDL_Color *rl_convert_rlcolor_to_sdlcolor_i(RL_Color color) {
-  SDL_Color *rl_sdl_color_i = (SDL_Color *)malloc(sizeof(SDL_Color) * 1);
+  struct SDL_Color *rl_sdl_color_i = malloc(sizeof *rl_sdl_color_i);
   if (rl_sdl_color_i == NULL) {
     return NULL;
   }
@@ -16,8 +16,7 @@ SDL_Color *rl_convert_rlcolor_to_sdlcolor_i(RL_Color color) {
 }
 
 RL_Font *RL_CreateFont(const char *path, uint8_t size) {
-  struct RL_Font *rl_font_i =
-      (struct RL_Font *)malloc(sizeof(struct RL_Font) * 1);
+  struct RL_Font *rl_font_i = malloc(sizeof *rl_font_i);
   if (rl_font_i == NULL) {
     return NULL;
   }

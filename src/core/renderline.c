@@ -27,8 +27,7 @@ RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
     return NULL;
   }
 
-  struct RL_Window *rl_window_i =
-      (struct RL_Window *)malloc(sizeof(struct RL_Window));
+  struct RL_Window *rl_window_i = malloc(sizeof *rl_window_i);
   if (rl_window_i == NULL) {
     return NULL;
   }
@@ -67,8 +66,7 @@ RL_GameInfo *RL_CreateGameInfo(char *name, char *description, char *version) {
     return NULL;
   }
 
-  struct RL_GameInfo *rl_gameinfo_i =
-      (struct RL_GameInfo *)malloc(sizeof(struct RL_GameInfo));
+  struct RL_GameInfo *rl_gameinfo_i = malloc(sizeof *rl_gameinfo_i);
   if (rl_gameinfo_i == NULL) {
     return NULL;
   }

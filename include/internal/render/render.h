@@ -7,7 +7,7 @@
 /* Create functions */
 
 /* Helper functions */
-RL_Error RL_ShowMenu(RL_Menu *menu);
+RL_Error RL_ShowMenu(RL_Window *window, RL_Menu *menu);
 
 /* Destroy functions */
 

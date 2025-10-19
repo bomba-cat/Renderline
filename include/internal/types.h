@@ -24,6 +24,7 @@ typedef struct RL_Font {
 
 typedef struct RL_Window {
   SDL_Window *sdl_window;
+  SDL_Renderer *sdl_renderer;
   RL_Font *default_font;
   char *title;
 } RL_Window;

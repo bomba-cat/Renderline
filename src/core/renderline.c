@@ -35,13 +35,24 @@ RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
   rl_window_i->sdl_window = SDL_CreateWindow(
       gameinfo->name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width,
       height, SDL_WINDOW_SHOWN);
+  if (rl_window_i->sdl_window == NULL) {
+    RL_DestroyWindow(rl_window_i);
+    return NULL;
+  }
+
+  rl_window_i->sdl_renderer =
+      SDL_CreateRenderer(rl_window_i->sdl_window, -1, SDL_RENDERER_ACCELERATED);
+  if (rl_window_i->sdl_renderer == NULL) {
+    RL_DestroyWindow(rl_window_i);
+    return NULL;
+  }
+
   /* Explicitly set this to NULL for now
    * TODO: Maybe create a real standard font*/
   rl_window_i->default_font = NULL;
-  rl_window_i->title = strdup(gameinfo->name);
 
-  if (rl_window_i->sdl_window == NULL ||
-      strcmp(rl_window_i->title, gameinfo->name)) {
+  rl_window_i->title = strdup(gameinfo->name);
+  if (strcmp(rl_window_i->title, gameinfo->name)) {
     RL_DestroyWindow(rl_window_i);
     return NULL;
   }
@@ -54,6 +65,7 @@ RL_Error RL_DestroyWindow(RL_Window *window) {
   }
 
   SDL_DestroyWindow(window->sdl_window);
+  SDL_DestroyRenderer(window->sdl_renderer);
   free(window->title);
   free(window);
   window = NULL;

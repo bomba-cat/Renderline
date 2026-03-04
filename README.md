@@ -13,3 +13,7 @@ cmake -B build
 ```bash
 cmake --build build
 ```
+
+## Public headers
+- Include the umbrella header as `#include <renderline/renderline.h>`.
+- Only the `include/renderline/` directory is part of the public API.

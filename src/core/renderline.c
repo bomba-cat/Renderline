@@ -1,7 +1,27 @@
-#include "../../include/renderline.h"
-#include "rl_internal.h"
+#include "../rl_internal.h"
 
-RL_Error RL_Init() {
+#include <stdlib.h>
+#include <string.h>
+
+char *rl_strdup_i(const char *value) {
+  size_t value_length;
+  char *copy;
+
+  if (value == NULL) {
+    return NULL;
+  }
+
+  value_length = strlen(value) + 1;
+  copy = malloc(value_length);
+  if (copy == NULL) {
+    return NULL;
+  }
+
+  memcpy(copy, value, value_length);
+  return copy;
+}
+
+RL_Error RL_Init(void) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     return RL_UNDEFINED_ERROR;
   }
@@ -12,22 +32,23 @@ RL_Error RL_Init() {
   return RL_OK;
 }
 
-RL_Error RL_Quit() {
+RL_Error RL_Quit(void) {
   TTF_Quit();
   SDL_Quit();
   return RL_OK;
 }
 
-RL_Error rl_draw_hint_i(RL_Window *window) { return RL_OK; }
+RL_Window *RL_CreateWindow(const RL_GameInfo *gameinfo, int width, int height) {
+  struct RL_Window *rl_window_i;
 
-RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
   if (gameinfo == NULL || width <= 0 || height <= 0) {
     return NULL;
-  } else if (gameinfo->name == NULL) {
+  }
+  if (gameinfo->name == NULL) {
     return NULL;
   }
 
-  struct RL_Window *rl_window_i = malloc(sizeof *rl_window_i);
+  rl_window_i = calloc(1, sizeof *rl_window_i);
   if (rl_window_i == NULL) {
     return NULL;
   }
@@ -50,9 +71,11 @@ RL_Window *RL_CreateWindow(RL_GameInfo *gameinfo, int width, int height) {
   /* Explicitly set this to NULL for now
    * TODO: Maybe create a real standard font*/
   rl_window_i->default_font = NULL;
+  rl_window_i->width = width;
+  rl_window_i->height = height;
 
-  rl_window_i->title = strdup(gameinfo->name);
-  if (strcmp(rl_window_i->title, gameinfo->name)) {
+  rl_window_i->title = rl_strdup_i(gameinfo->name);
+  if (rl_window_i->title == NULL) {
     RL_DestroyWindow(rl_window_i);
     return NULL;
   }
@@ -64,32 +87,37 @@ RL_Error RL_DestroyWindow(RL_Window *window) {
     return RL_UNDEFINED_ERROR;
   }
 
-  SDL_DestroyWindow(window->sdl_window);
-  SDL_DestroyRenderer(window->sdl_renderer);
+  if (window->sdl_renderer != NULL) {
+    SDL_DestroyRenderer(window->sdl_renderer);
+  }
+  if (window->sdl_window != NULL) {
+    SDL_DestroyWindow(window->sdl_window);
+  }
   free(window->title);
   free(window);
-  window = NULL;
 
   return RL_OK;
 }
 
-RL_GameInfo *RL_CreateGameInfo(char *name, char *description, char *version) {
+RL_GameInfo *RL_CreateGameInfo(const char *name, const char *description,
+                               const char *version) {
+  struct RL_GameInfo *rl_gameinfo_i;
+
   if (description == NULL || name == NULL || version == NULL) {
     return NULL;
   }
 
-  struct RL_GameInfo *rl_gameinfo_i = malloc(sizeof *rl_gameinfo_i);
+  rl_gameinfo_i = calloc(1, sizeof *rl_gameinfo_i);
   if (rl_gameinfo_i == NULL) {
     return NULL;
   }
 
-  rl_gameinfo_i->description = strdup(description);
-  rl_gameinfo_i->name = strdup(name);
-  rl_gameinfo_i->version = strdup(version);
+  rl_gameinfo_i->description = rl_strdup_i(description);
+  rl_gameinfo_i->name = rl_strdup_i(name);
+  rl_gameinfo_i->version = rl_strdup_i(version);
 
-  if (strcmp(rl_gameinfo_i->description, description) ||
-      strcmp(rl_gameinfo_i->name, name) ||
-      strcmp(rl_gameinfo_i->version, version)) {
+  if (rl_gameinfo_i->description == NULL || rl_gameinfo_i->name == NULL ||
+      rl_gameinfo_i->version == NULL) {
     RL_DestroyGameInfo(rl_gameinfo_i);
     return NULL;
   }
@@ -106,7 +134,54 @@ RL_Error RL_DestroyGameInfo(RL_GameInfo *gameinfo) {
   free(gameinfo->name);
   free(gameinfo->version);
   free(gameinfo);
-  gameinfo = NULL;
 
   return RL_OK;
+}
+
+const char *RL_GameInfoGetName(const RL_GameInfo *gameinfo) {
+  if (gameinfo == NULL) {
+    return NULL;
+  }
+
+  return gameinfo->name;
+}
+
+const char *RL_GameInfoGetDescription(const RL_GameInfo *gameinfo) {
+  if (gameinfo == NULL) {
+    return NULL;
+  }
+
+  return gameinfo->description;
+}
+
+const char *RL_GameInfoGetVersion(const RL_GameInfo *gameinfo) {
+  if (gameinfo == NULL) {
+    return NULL;
+  }
+
+  return gameinfo->version;
+}
+
+const char *RL_WindowGetTitle(const RL_Window *window) {
+  if (window == NULL) {
+    return NULL;
+  }
+
+  return window->title;
+}
+
+int RL_WindowGetWidth(const RL_Window *window) {
+  if (window == NULL) {
+    return 0;
+  }
+
+  return window->width;
+}
+
+int RL_WindowGetHeight(const RL_Window *window) {
+  if (window == NULL) {
+    return 0;
+  }
+
+  return window->height;
 }

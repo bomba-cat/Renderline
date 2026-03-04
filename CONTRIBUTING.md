@@ -74,7 +74,7 @@ RL_Error RL_Bar(const char *path, RL_Foo **out);
 
 ## Project Structure
 
-* `include/` -> Public API headers.
+* `include/renderline/` -> Public API headers.
 * `src/` -> Internal engine code.
 
 ---

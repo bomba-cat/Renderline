@@ -1,103 +1,131 @@
-#include "../../include/renderline.h"
-#include "rl_internal.h"
+#include "../rl_internal.h"
 
-RL_Menu *RL_CreateMenu() {
-  struct RL_Menu *rl_menu_i = malloc(sizeof *rl_menu_i);
+#include <stdlib.h>
+
+static RL_Error rl_menu_reserve_i(RL_Menu *menu, size_t minimum_capacity) {
+  RL_MenuEntryInternal *resized_entries;
+  size_t new_capacity;
+
+  if (menu == NULL) {
+    return RL_UNDEFINED_ERROR;
+  }
+
+  if (menu->entry_capacity >= minimum_capacity) {
+    return RL_OK;
+  }
+
+  new_capacity = menu->entry_capacity == 0 ? 4 : menu->entry_capacity;
+  while (new_capacity < minimum_capacity) {
+    new_capacity *= 2;
+  }
+
+  resized_entries = realloc(menu->entries, sizeof(*menu->entries) * new_capacity);
+  if (resized_entries == NULL) {
+    return RL_UNDEFINED_ERROR;
+  }
+
+  menu->entries = resized_entries;
+  menu->entry_capacity = new_capacity;
+  return RL_OK;
+}
+
+RL_Menu *RL_CreateMenu(void) {
+  struct RL_Menu *rl_menu_i;
+
+  rl_menu_i = calloc(1, sizeof *rl_menu_i);
 
   if (rl_menu_i == NULL) {
     return NULL;
   }
 
-  rl_menu_i->entries = malloc(sizeof *rl_menu_i->entries);
-  rl_menu_i->functions = malloc(sizeof *rl_menu_i->functions);
-  if (rl_menu_i->entries == NULL || rl_menu_i->functions == NULL) {
+  if (rl_menu_reserve_i(rl_menu_i, 4) != RL_OK) {
     RL_DestroyMenu(rl_menu_i);
     return NULL;
   }
 
-  rl_menu_i->entries[0] = NULL;
-  rl_menu_i->functions[0] = NULL;
-
   return rl_menu_i;
 }
 
-RL_Error rl_get_functions_size_i(void *(**functions)(void), int *count) {
-  if (functions == NULL) {
+RL_Error RL_MenuAddEntry(RL_Menu *menu, const char *label,
+                         RL_MenuCallback callback, void *userdata) {
+  RL_MenuEntryInternal *entry;
+
+  if (menu == NULL || label == NULL || callback == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  do {
-    (*count)++;
-  } while (functions[*count - 1] != NULL);
-
-  return RL_OK;
-}
-
-RL_Error rl_get_entries_size_i(char **entries, int *count) {
-  if (entries == NULL) {
+  if (rl_menu_reserve_i(menu, menu->entry_count + 1) != RL_OK) {
     return RL_UNDEFINED_ERROR;
   }
 
-  do {
-    (*count)++;
-  } while (entries[*count - 1] != NULL);
-
-  return RL_OK;
-}
-
-RL_Error RL_AddMenuEntry(RL_Menu *menu, char *entry, void *(*func)(void)) {
-  if (menu == NULL || entry == NULL || func == NULL) {
+  entry = &menu->entries[menu->entry_count];
+  entry->label = rl_strdup_i(label);
+  if (entry->label == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  int rl_entries_count_i = 0;
-  int rl_functions_count_i = 0;
-  if (rl_get_functions_size_i(menu->functions, &rl_functions_count_i) > 0 ||
-      rl_get_entries_size_i(menu->entries, &rl_entries_count_i) > 0) {
-    return RL_UNDEFINED_ERROR;
-  }
-
-  /* TODO: fix invalid realloc size */
-  void *rl_entries_new_ptr_i =
-      realloc(menu->entries, sizeof(char **) * (rl_entries_count_i + 1));
-  void *rl_functions_new_ptr_i = realloc(
-      menu->functions, sizeof(void *(**)(void)) * (rl_functions_count_i + 1));
-  if (rl_entries_new_ptr_i == NULL || rl_functions_new_ptr_i == NULL) {
-    return RL_UNDEFINED_ERROR;
-  }
-
-  /* Prevention of memory leak was the reason for creating the
-   * temporary pointer. If the check didn't fail then we can
-   * safely set it to the new pointer. */
-  menu->entries = rl_entries_new_ptr_i;
-  menu->functions = rl_functions_new_ptr_i;
-
-  menu->entries[rl_entries_count_i] = strdup(entry);
-  menu->entries[rl_entries_count_i + 1] = NULL;
-
-  menu->functions[rl_functions_count_i] = func;
-  menu->functions[rl_functions_count_i + 1] = NULL;
-
-  if (strcmp(menu->entries[rl_entries_count_i], entry)) {
-    return RL_UNDEFINED_ERROR;
-  }
+  entry->callback = callback;
+  entry->userdata = userdata;
+  menu->entry_count++;
 
   return RL_OK;
 }
 
 RL_Error RL_DestroyMenu(RL_Menu *menu) {
+  size_t entry_index;
+
   if (menu == NULL) {
     return RL_UNDEFINED_ERROR;
   }
 
-  for (size_t entry = 0; menu->entries[entry] != NULL; entry++) {
-    free(menu->entries[entry]);
-    menu->entries[entry] = NULL;
+  for (entry_index = 0; entry_index < menu->entry_count; entry_index++) {
+    free(menu->entries[entry_index].label);
   }
   free(menu->entries);
-  free(menu->functions);
   free(menu);
-  menu = NULL;
 
+  return RL_OK;
+}
+
+size_t RL_MenuGetEntryCount(const RL_Menu *menu) {
+  if (menu == NULL) {
+    return 0;
+  }
+
+  return menu->entry_count;
+}
+
+const char *RL_MenuGetEntryLabel(const RL_Menu *menu, size_t index) {
+  if (menu == NULL || index >= menu->entry_count) {
+    return NULL;
+  }
+
+  return menu->entries[index].label;
+}
+
+RL_MenuCallback RL_MenuGetEntryCallback(const RL_Menu *menu, size_t index) {
+  if (menu == NULL || index >= menu->entry_count) {
+    return NULL;
+  }
+
+  return menu->entries[index].callback;
+}
+
+void *RL_MenuGetEntryUserData(const RL_Menu *menu, size_t index) {
+  if (menu == NULL || index >= menu->entry_count) {
+    return NULL;
+  }
+
+  return menu->entries[index].userdata;
+}
+
+RL_Error RL_MenuSetRenderer(RL_Menu *menu, const RL_MenuRenderer *renderer,
+                            void *userdata) {
+  if (menu == NULL) {
+    return RL_UNDEFINED_ERROR;
+  }
+
+  menu->renderer = renderer;
+  menu->renderer_userdata = userdata;
   return RL_OK;
 }

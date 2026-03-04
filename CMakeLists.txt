@@ -15,6 +15,7 @@ set(RENDERLINE_SOURCES
 	src/core/renderline.c
 	src/core/rl_menu.c
 	src/io/rl_file.c
+	src/render/rl_menu.c
 	src/render/rl_sprite.c
 	src/render/rl_surface.c
 	src/text/rl_text.c
@@ -22,8 +23,6 @@ set(RENDERLINE_SOURCES
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} include)
-include_directories(${SDL2_TTF_INCLUDE_DIRS} include)
 
 add_library(Renderline SHARED
 	${RENDERLINE_SOURCES}
@@ -35,4 +34,19 @@ target_link_libraries(Renderline
 	SDL2_ttf::SDL2_ttf
 )
 
-target_include_directories(Renderline PUBLIC include)
+target_include_directories(Renderline
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
+		${SDL2_INCLUDE_DIRS}
+		${SDL2_TTF_INCLUDE_DIRS}
+)
+
+install(TARGETS Renderline
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	RUNTIME DESTINATION bin
+)
+install(DIRECTORY include/renderline DESTINATION include)
